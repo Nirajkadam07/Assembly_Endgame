@@ -3,7 +3,15 @@ import { languages } from "./languages";
 
 export default function AssemblyEndgame() {
   const languagesChips = languages.map((language) => {
-    return <p>{language.name}</p>;
+    const styles = {
+      backgroundColor: language.backgroundColor,
+      color: language.color,
+    };
+    return (
+      <span style={styles} key={language.name}>
+        {language.name}
+      </span>
+    );
   });
 
   return (
@@ -21,7 +29,7 @@ export default function AssemblyEndgame() {
           <p>Well done!🎉</p>
         </section>
 
-        <section>{languagesChips}</section>
+        <section className="language-chips">{languagesChips}</section>
       </main>
     </>
   );
