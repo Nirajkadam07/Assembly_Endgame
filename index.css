@@ -53,3 +53,20 @@ body {
   font-weight: 500;
   font-size: 1rem;
 }
+
+.language-chips {
+  margin-block: 40px;
+  max-width: 350px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.language-chips span {
+  padding: 5px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
