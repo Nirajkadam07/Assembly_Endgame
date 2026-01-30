@@ -2,6 +2,9 @@ import React from "react";
 import { languages } from "./languages";
 
 export default function AssemblyEndgame() {
+  const [currentWord, setCurrentWord] = React.useState("react");
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+
   const languagesChips = languages.map((language) => {
     const styles = {
       backgroundColor: language.backgroundColor,
@@ -14,22 +17,32 @@ export default function AssemblyEndgame() {
     );
   });
 
+  const letterElements = currentWord.split("").map((letter, index) => {
+    return <span key={index}>{letter.toUpperCase()}</span>;
+  });
+
+  const keyboard = alphabet.split("").map((letter) => {
+    return <button key={letter}>{letter.toUpperCase()}</button>;
+  });
+
   return (
     <>
-      <header className="header">
-        <h1>Assembly: Endgame</h1>
-        <p>
-          Guess the word in under 8 attempts to keep the programming world safe
-          from Assembly!
-        </p>
-      </header>
       <main>
+        <header className="header">
+          <h1>Assembly: Endgame</h1>
+          <p>
+            Guess the word in under 8 attempts to keep the programming world
+            safe from Assembly!
+          </p>
+        </header>
         <section className="status">
           <h2>You Win!</h2>
           <p>Well done!🎉</p>
         </section>
 
         <section className="language-chips">{languagesChips}</section>
+        <section className="word">{letterElements}</section>
+        <section className="keyboard">{keyboard}</section>
       </main>
     </>
   );
