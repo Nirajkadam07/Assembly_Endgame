@@ -7,7 +7,9 @@ export default function AssemblyEndgame() {
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
   function keyboardClick(e) {
-    setGuessedLetters((prevArr) => prevArr.push(e.target.innerText));
+    setGuessedLetters((prevArr) => {
+      return [...prevArr, e.target.innerText];
+    });
   }
   console.log(guessedLetters);
   
