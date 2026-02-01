@@ -35,12 +35,17 @@ export default function AssemblyEndgame() {
   });
 
   const letterElements = currentWord.split("").map((letter, index) => {
-    const isGuessd = guessedLetters.includes(letter);
-    const isCorrect = isGuessd && currentWord.includes(letter);
+    // const isGuessd = guessedLetters.includes(letter);
 
-    return isGuessd && currentWord.includes(letter) ? (
-      <span key={index}>{letter.toUpperCase()}</span>
-    ) : null;
+    // return isGuessd && currentWord.includes(letter) ? (
+    //   <span key={index}>{letter.toUpperCase()}</span>
+    // ) : null;
+
+    return (
+      <span key={index}>
+        {guessedLetters.includes(letter) ? letter.toUpperCase() : ""}
+      </span>
+    );
   });
 
   const keyboard = alphabet.split("").map((letter) => {
