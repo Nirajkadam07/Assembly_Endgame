@@ -3,10 +3,16 @@ import { clsx } from "clsx";
 import { languages } from "./languages";
 
 export default function AssemblyEndgame() {
+  // State values
   const [currentWord, setCurrentWord] = React.useState("react");
-
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
+  // Derived values
+  let wrongGuessCount = guessedLetters.filter(
+    (letter) => !currentWord.includes(letter),
+  ).length;
+
+  // Static values
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
   function addGuessedLetter(letter) {
