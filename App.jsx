@@ -1,4 +1,5 @@
 import React from "react";
+import { clsx } from "clsx";
 import { languages } from "./languages";
 
 export default function AssemblyEndgame() {
@@ -6,14 +7,20 @@ export default function AssemblyEndgame() {
 
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
-  function keyboardClick(e) {
-    setGuessedLetters((prevArr) => {
-      return [...prevArr, e.target.innerText];
-    });
-  }
-  console.log(guessedLetters);
-  
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+  function addGuessedLetter(letter) {
+    setGuessedLetters(
+      (prevLetters) =>
+        prevLetters.includes(letter) ? prevLetters : [...prevLetters, letter],
+
+      // {
+      //   const lettersSet = new Set(prevLetters);
+      //   lettersSet.add(letter);
+      //   return Array.from(lettersSet);
+      // },
+    );
+  }
 
   const languagesChips = languages.map((language) => {
     const styles = {
@@ -28,11 +35,32 @@ export default function AssemblyEndgame() {
   });
 
   const letterElements = currentWord.split("").map((letter, index) => {
-    return <span key={index}>{letter.toUpperCase()}</span>;
+    const isGuessd = guessedLetters.includes(letter);
+    const isCorrect = isGuessd && currentWord.includes(letter);
+
+    return isGuessd && currentWord.includes(letter) ? (
+      <span key={index}>{letter.toUpperCase()}</span>
+    ) : null;
   });
 
   const keyboard = alphabet.split("").map((letter) => {
-    return <button key={letter} onClick={keyboardClick}>{letter.toUpperCase()}</button>;
+    const isGuessd = guessedLetters.includes(letter);
+    const isCorrect = isGuessd && currentWord.includes(letter);
+    const isWrong = isGuessd && !currentWord.includes(letter);
+    const classname = clsx({
+      correct: isCorrect,
+      wrong: isWrong,
+    });
+
+    return (
+      <button
+        className={classname}
+        key={letter}
+        onClick={() => addGuessedLetter(letter)}
+      >
+        {letter.toUpperCase()}
+      </button>
+    );
   });
 
   return (
@@ -53,6 +81,7 @@ export default function AssemblyEndgame() {
         <section className="language-chips">{languagesChips}</section>
         <section className="word">{letterElements}</section>
         <section className="keyboard">{keyboard}</section>
+        <button className="new-game-btn">New Game</button>
       </main>
     </>
   );
