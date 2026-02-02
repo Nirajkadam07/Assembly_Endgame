@@ -41,11 +41,20 @@ main {
 .status {
   width: 350px;
   height: 60px;
-  background-color: #10a95b;
   border-radius: 4px;
   border: none;
   color: #f9f4da;
   text-align: center;
+}
+
+.status-won {
+  background-color: #10a95b;
+  border-radius: 4px;
+}
+
+.status-lost {
+  background-color: #ba2a2a;
+  border-radius: 4px;
 }
 
 .status h2 {
@@ -71,12 +80,28 @@ main {
   gap: 4px;
 }
 
-.language-chips span {
+span.chip {
   padding: 5px;
   border: none;
   border-radius: 4px;
   font-weight: 700;
   font-size: 0.75rem;
+  position: relative;
+}
+
+span.chip.lost::before {
+  content: "💀";
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  font-size: 0.85rem;
+  font-weight: normal;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 .word {
@@ -140,4 +165,5 @@ main {
   font-family: "Hanken Grotesk", Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
+  cursor: pointer;
 }
