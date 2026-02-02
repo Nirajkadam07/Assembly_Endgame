@@ -12,6 +12,12 @@ export default function AssemblyEndgame() {
     (letter) => !currentWord.includes(letter),
   ).length;
 
+  const isGameWon = currentWord
+    .split("")
+    .every((letter) => guessedLetters.includes(letter));
+  const isGameLost = wrongGuessCount >= languages.length - 1;
+  const isGameOver = isGameWon || isGameLost;
+
   // Static values
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -28,13 +34,20 @@ export default function AssemblyEndgame() {
     );
   }
 
-  const languagesChips = languages.map((language) => {
+  const languagesChips = languages.map((language, index) => {
+    const isLost = index < wrongGuessCount;
+
     const styles = {
       backgroundColor: language.backgroundColor,
       color: language.color,
     };
+
     return (
-      <span style={styles} key={language.name}>
+      <span
+        style={styles}
+        key={language.name}
+        className={`chip ${isLost ? "lost" : ""}`}
+      >
         {language.name}
       </span>
     );
@@ -74,6 +87,30 @@ export default function AssemblyEndgame() {
     );
   });
 
+  function Status() {
+    if (isGameOver) {
+      if (isGameWon) {
+        return (
+          <div className="status-won">
+            <h2>You Win!</h2>
+            <p>Well done!🎉</p>
+          </div>
+        );
+      } else if (isGameLost) {
+        return (
+          <div className="status-lost">
+            <h2>Game Over!</h2>
+            <p>You lose! Better start learning assembly 😭</p>
+          </div>
+        );
+      } else {
+        return "";
+      }
+    } else {
+      return null;
+    }
+  }
+
   return (
     <>
       <main>
@@ -85,14 +122,13 @@ export default function AssemblyEndgame() {
           </p>
         </header>
         <section className="status">
-          <h2>You Win!</h2>
-          <p>Well done!🎉</p>
+          <Status />
         </section>
 
         <section className="language-chips">{languagesChips}</section>
         <section className="word">{letterElements}</section>
         <section className="keyboard">{keyboard}</section>
-        <button className="new-game-btn">New Game</button>
+        {isGameOver && <button className="new-game-btn">New Game</button>}
       </main>
     </>
   );
