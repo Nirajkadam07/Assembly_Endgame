@@ -47,12 +47,12 @@ main {
   text-align: center;
 }
 
-.status-won {
+.won {
   background-color: #10a95b;
   border-radius: 4px;
 }
 
-.status-lost {
+.lost {
   background-color: #ba2a2a;
   border-radius: 4px;
 }
