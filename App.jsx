@@ -87,21 +87,26 @@ export default function AssemblyEndgame() {
     );
   });
 
+  const gameStatusClass = clsx("status", {
+    won: isGameWon,
+    lost: isGameLost,
+  });
+
   function Status() {
     if (isGameOver) {
       if (isGameWon) {
         return (
-          <div className="status-won">
+          <>
             <h2>You Win!</h2>
             <p>Well done!🎉</p>
-          </div>
+          </>
         );
       } else if (isGameLost) {
         return (
-          <div className="status-lost">
+          <>
             <h2>Game Over!</h2>
             <p>You lose! Better start learning assembly 😭</p>
-          </div>
+          </>
         );
       } else {
         return "";
@@ -121,7 +126,7 @@ export default function AssemblyEndgame() {
             safe from Assembly!
           </p>
         </header>
-        <section className="status">
+        <section className={gameStatusClass}>
           <Status />
         </section>
 
