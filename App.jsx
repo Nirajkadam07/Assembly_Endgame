@@ -1,6 +1,7 @@
 import React from "react";
 import { clsx } from "clsx";
 import { languages } from "./languages";
+import { getFarewellText } from "./utils";
 
 export default function AssemblyEndgame() {
   // State values
@@ -8,15 +9,17 @@ export default function AssemblyEndgame() {
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
   // Derived values
-  let wrongGuessCount = guessedLetters.filter(
+  const wrongGuessCount = guessedLetters.filter(
     (letter) => !currentWord.includes(letter),
   ).length;
-
   const isGameWon = currentWord
     .split("")
     .every((letter) => guessedLetters.includes(letter));
   const isGameLost = wrongGuessCount >= languages.length - 1;
   const isGameOver = isGameWon || isGameLost;
+  const lastGuessedLetter = guessedLetters[guessedLetters.length - 1];
+  const isLastGuessIncorrect =
+    lastGuessedLetter && !currentWord.includes(lastGuessedLetter);
 
   // Static values
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -35,7 +38,7 @@ export default function AssemblyEndgame() {
   }
 
   const languagesChips = languages.map((language, index) => {
-    const isLost = index < wrongGuessCount;
+    const isLanguageLost = index < wrongGuessCount;
 
     const styles = {
       backgroundColor: language.backgroundColor,
@@ -46,7 +49,7 @@ export default function AssemblyEndgame() {
       <span
         style={styles}
         key={language.name}
-        className={`chip ${isLost ? "lost" : ""}`}
+        className={`chip ${isLanguageLost ? "lost" : ""}`}
       >
         {language.name}
       </span>
@@ -81,6 +84,7 @@ export default function AssemblyEndgame() {
         className={classname}
         key={letter}
         onClick={() => addGuessedLetter(letter)}
+        disabled={isGameOver}
       >
         {letter.toUpperCase()}
       </button>
@@ -90,30 +94,37 @@ export default function AssemblyEndgame() {
   const gameStatusClass = clsx("status", {
     won: isGameWon,
     lost: isGameLost,
+    farewell: !isGameOver && isLastGuessIncorrect,
   });
 
-  function Status() {
-    if (isGameOver) {
-      if (isGameWon) {
-        return (
-          <>
-            <h2>You Win!</h2>
-            <p>Well done!🎉</p>
-          </>
-        );
-      } else if (isGameLost) {
-        return (
-          <>
-            <h2>Game Over!</h2>
-            <p>You lose! Better start learning assembly 😭</p>
-          </>
-        );
-      } else {
-        return "";
-      }
-    } else {
-      return null;
+  function renderGameStatus() {
+    if (!isGameOver && isLastGuessIncorrect) {
+      return (
+        <p className="farewell-message">
+          {getFarewellText(languages[wrongGuessCount - 1].name)}
+        </p>
+      );
     }
+
+    if (isGameWon) {
+      return (
+        <>
+          <h2>You Win!</h2>
+          <p>Well done!🎉</p>
+        </>
+      );
+    }
+
+    if (isGameLost) {
+      return (
+        <>
+          <h2>Game Over!</h2>
+          <p>You lose! Better start learning assembly 😭</p>
+        </>
+      );
+    }
+
+    return null;
   }
 
   return (
@@ -126,9 +137,7 @@ export default function AssemblyEndgame() {
             safe from Assembly!
           </p>
         </header>
-        <section className={gameStatusClass}>
-          <Status />
-        </section>
+        <section className={gameStatusClass}>{renderGameStatus()}</section>
 
         <section className="language-chips">{languagesChips}</section>
         <section className="word">{letterElements}</section>
