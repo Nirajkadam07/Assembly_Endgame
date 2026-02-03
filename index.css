@@ -57,6 +57,16 @@ main {
   border-radius: 4px;
 }
 
+.farewell {
+  background-color: #7a5ea7;
+  border: 1px dashed #323232;
+}
+
+.farewell-message {
+  font-style: italic;
+  font-weight: 400;
+}
+
 .status h2 {
   margin-top: 0;
   margin-bottom: 2px;
