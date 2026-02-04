@@ -1,14 +1,16 @@
 import React from "react";
 import { clsx } from "clsx";
 import { languages } from "./languages";
-import { getFarewellText } from "./utils";
+import { getFarewellText, getRandomWord } from "./utils";
+import Confetti from "react-confetti";
 
 export default function AssemblyEndgame() {
   // State values
-  const [currentWord, setCurrentWord] = React.useState("react");
+  const [currentWord, setCurrentWord] = React.useState(() => getRandomWord());
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
   // Derived values
+  const numGuessesLeft = languages.length - 1;
   const wrongGuessCount = guessedLetters.filter(
     (letter) => !currentWord.includes(letter),
   ).length;
@@ -63,9 +65,14 @@ export default function AssemblyEndgame() {
     //   <span key={index}>{letter.toUpperCase()}</span>
     // ) : null;
 
+    const shouldRevealLetter = isGameLost || guessedLetters.includes(letter);
+    const letterClassName = clsx(
+      isGameLost && !guessedLetters.includes(letter) && "missed-letter",
+    );
+
     return (
-      <span key={index}>
-        {guessedLetters.includes(letter) ? letter.toUpperCase() : ""}
+      <span key={index} className={letterClassName}>
+        {shouldRevealLetter ? letter.toUpperCase() : ""}
       </span>
     );
   });
@@ -85,6 +92,8 @@ export default function AssemblyEndgame() {
         key={letter}
         onClick={() => addGuessedLetter(letter)}
         disabled={isGameOver}
+        aria-disabled={guessedLetters.includes(letter)}
+        aria-label={`Letter ${letter}`}
       >
         {letter.toUpperCase()}
       </button>
@@ -127,9 +136,15 @@ export default function AssemblyEndgame() {
     return null;
   }
 
+  function newGame() {
+    setGuessedLetters([]);
+    setCurrentWord(getRandomWord());
+  }
+
   return (
     <>
       <main>
+        {isGameWon && <Confetti recycle={false} numberOfPieces={1000} />}
         <header className="header">
           <h1>Assembly: Endgame</h1>
           <p>
@@ -137,12 +152,35 @@ export default function AssemblyEndgame() {
             safe from Assembly!
           </p>
         </header>
-        <section className={gameStatusClass}>{renderGameStatus()}</section>
+        <section className={gameStatusClass} aria-live="polite" role="status">
+          {renderGameStatus()}
+        </section>
 
         <section className="language-chips">{languagesChips}</section>
         <section className="word">{letterElements}</section>
+        <section className="sr-only" aria-live="polite" role="status">
+          <p>
+            {currentWord.includes(lastGuessedLetter)
+              ? `Correct! The letter ${lastGuessedLetter} is in the word.`
+              : `Sorry, the letter ${lastGuessedLetter} is not in the word`}
+            You have {numGuessesLeft} attempts left.
+          </p>
+          <p>
+            Current word:{" "}
+            {currentWord
+              .split("")
+              .map((letter) =>
+                guessedLetters.includes(letter) ? letter + "." : "blank",
+              )
+              .join(" ")}
+          </p>
+        </section>
         <section className="keyboard">{keyboard}</section>
-        {isGameOver && <button className="new-game-btn">New Game</button>}
+        {isGameOver && (
+          <button onClick={newGame} className="new-game-btn">
+            New Game
+          </button>
+        )}
       </main>
     </>
   );
