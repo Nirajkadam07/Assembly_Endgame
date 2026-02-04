@@ -133,6 +133,10 @@ span.chip.lost::before {
   border-bottom: 1px solid #f9f4da;
 }
 
+.word span.missed-letter {
+  color: #ec5d49;
+}
+
 .keyboard {
   max-width: 480px;
   display: flex;
@@ -181,4 +185,16 @@ span.chip.lost::before {
   font-weight: 400;
   font-size: 1rem;
   cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
