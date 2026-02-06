@@ -3,6 +3,7 @@ import { clsx } from "clsx";
 import { languages } from "./languages";
 import { getFarewellText, getRandomWord } from "./utils";
 import Confetti from "react-confetti";
+import { useTimer } from "react-timer-hook";
 
 export default function AssemblyEndgame() {
   // State values
@@ -141,6 +142,19 @@ export default function AssemblyEndgame() {
     setCurrentWord(getRandomWord());
   }
 
+  function Mytimer({ expiryTimestamp }) {
+    const { minutes, seconds } = useTimer({
+      expiryTimestamp,
+      onExpire: () => {
+        console.log("timer expired");
+      },
+    });
+    return <span>{`${minutes} : ${seconds}`}</span>;
+  }
+
+  const time = new Date();
+  time.setSeconds(time.getSeconds() + 120);
+
   return (
     <>
       <main>
@@ -157,6 +171,7 @@ export default function AssemblyEndgame() {
         </section>
 
         <section className="language-chips">{languagesChips}</section>
+        <Mytimer expiryTimestamp={time} />
         <section className="word">{letterElements}</section>
         <section className="sr-only" aria-live="polite" role="status">
           <p>
