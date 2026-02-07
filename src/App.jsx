@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { clsx } from "clsx";
 import { languages } from "./languages";
 import { getFarewellText, getRandomWord } from "./utils";
@@ -15,10 +15,14 @@ export default function AssemblyEndgame() {
   const wrongGuessCount = guessedLetters.filter(
     (letter) => !currentWord.includes(letter),
   ).length;
+
+  const [isGameLost, setIsGameLost] = React.useState(
+    wrongGuessCount >= languages.length - 1,
+  );
+
   const isGameWon = currentWord
     .split("")
     .every((letter) => guessedLetters.includes(letter));
-  const isGameLost = wrongGuessCount >= languages.length - 1;
   const isGameOver = isGameWon || isGameLost;
   const lastGuessedLetter = guessedLetters[guessedLetters.length - 1];
   const isLastGuessIncorrect =
@@ -82,7 +86,7 @@ export default function AssemblyEndgame() {
     const isGuessd = guessedLetters.includes(letter);
     const isCorrect = isGuessd && currentWord.includes(letter);
     const isWrong = isGuessd && !currentWord.includes(letter);
-    const classname = clsx({
+    const classname = clsx("keyboardKey", {
       correct: isCorrect,
       wrong: isWrong,
     });
@@ -140,20 +144,27 @@ export default function AssemblyEndgame() {
   function newGame() {
     setGuessedLetters([]);
     setCurrentWord(getRandomWord());
+    setIsGameLost(false);
   }
+
+  const [timerKey, setTimerKey] = React.useState(0);
+
+  React.useEffect(() => {
+    setTimerKey((prev) => prev + 1);
+  }, [currentWord]);
 
   function Mytimer({ expiryTimestamp }) {
     const { minutes, seconds } = useTimer({
       expiryTimestamp,
+      autoStart: true,
       onExpire: () => {
         console.log("timer expired");
+        setIsGameLost(true);
       },
     });
-    return <span>{`${minutes} : ${seconds}`}</span>;
-  }
 
-  const time = new Date();
-  time.setSeconds(time.getSeconds() + 120);
+    return <span>Remaining time : {`${minutes} : ${seconds}`}</span>;
+  }
 
   return (
     <>
@@ -171,7 +182,10 @@ export default function AssemblyEndgame() {
         </section>
 
         <section className="language-chips">{languagesChips}</section>
-        <Mytimer expiryTimestamp={time} />
+        <Mytimer
+          key={timerKey}
+          expiryTimestamp={new Date(Date.now() + 5 * 1000)}
+        />
         <section className="word">{letterElements}</section>
         <section className="sr-only" aria-live="polite" role="status">
           <p>
