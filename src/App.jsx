@@ -3,12 +3,15 @@ import { clsx } from "clsx";
 import { languages } from "./languages";
 import { getFarewellText, getRandomWord } from "./utils";
 import Confetti from "react-confetti";
-import { useTimer } from "react-timer-hook";
+import GameTimer from "./GameTimer";
 
 export default function AssemblyEndgame() {
   // State values
   const [currentWord, setCurrentWord] = React.useState(() => getRandomWord());
   const [guessedLetters, setGuessedLetters] = React.useState([]);
+  const [isGameStarted, setIsGameStarted] = React.useState(false);
+  const [isTimeUp, setIsTimeUp] = React.useState(false);
+  const [gameCount, setGameCount] = React.useState(0);
 
   // Derived values
   const numGuessesLeft = languages.length - 1;
@@ -16,9 +19,7 @@ export default function AssemblyEndgame() {
     (letter) => !currentWord.includes(letter),
   ).length;
 
-  const [isGameLost, setIsGameLost] = React.useState(
-    wrongGuessCount >= languages.length - 1,
-  );
+  const isGameLost = wrongGuessCount >= languages.length - 1 || isTimeUp;
 
   const isGameWon = currentWord
     .split("")
@@ -96,7 +97,7 @@ export default function AssemblyEndgame() {
         className={classname}
         key={letter}
         onClick={() => addGuessedLetter(letter)}
-        disabled={isGameOver}
+        disabled={isGameOver || !isGameStarted}
         aria-disabled={guessedLetters.includes(letter)}
         aria-label={`Letter ${letter}`}
       >
@@ -143,27 +144,14 @@ export default function AssemblyEndgame() {
 
   function newGame() {
     setGuessedLetters([]);
+    setIsTimeUp(false);
     setCurrentWord(getRandomWord());
-    setIsGameLost(false);
+    setGameCount((prev) => prev + 1);
+    setIsGameStarted(false);
   }
 
-  const [timerKey, setTimerKey] = React.useState(0);
-
-  React.useEffect(() => {
-    setTimerKey((prev) => prev + 1);
-  }, [currentWord]);
-
-  function Mytimer({ expiryTimestamp }) {
-    const { minutes, seconds } = useTimer({
-      expiryTimestamp,
-      autoStart: true,
-      onExpire: () => {
-        console.log("timer expired");
-        setIsGameLost(true);
-      },
-    });
-
-    return <span>Remaining time : {`${minutes} : ${seconds}`}</span>;
+  function startGame() {
+    setIsGameStarted(true);
   }
 
   return (
@@ -173,8 +161,8 @@ export default function AssemblyEndgame() {
         <header className="header">
           <h1>Assembly: Endgame</h1>
           <p>
-            Guess the word in under 8 attempts to keep the programming world
-            safe from Assembly!
+            Guess the word in under 60 seconds and 8 attempts to keep the
+            programming world safe from Assembly!
           </p>
         </header>
         <section className={gameStatusClass} aria-live="polite" role="status">
@@ -182,11 +170,17 @@ export default function AssemblyEndgame() {
         </section>
 
         <section className="language-chips">{languagesChips}</section>
-        <Mytimer
-          key={timerKey}
-          expiryTimestamp={new Date(Date.now() + 5 * 1000)}
-        />
-        <section className="word">{letterElements}</section>
+        {isGameStarted && (
+          <GameTimer
+            key={gameCount}
+            expiryTimestamp={new Date(new Date().getTime() + 60000)}
+            isPaused={isGameOver}
+            onExpire={() => {
+              setIsTimeUp(true);
+            }}
+          />
+        )}
+        {<section className="word">{letterElements}</section>}
         <section className="sr-only" aria-live="polite" role="status">
           <p>
             {currentWord.includes(lastGuessedLetter)
@@ -205,6 +199,11 @@ export default function AssemblyEndgame() {
           </p>
         </section>
         <section className="keyboard">{keyboard}</section>
+        {!isGameOver && (
+          <button onClick={startGame} className="new-game-btn">
+            Start Game
+          </button>
+        )}
         {isGameOver && (
           <button onClick={newGame} className="new-game-btn">
             New Game
